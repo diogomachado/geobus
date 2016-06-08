@@ -12,6 +12,30 @@ var app = {
         app.getGeo();
     },
 
+    // Get map by using coordinates
+    getMap: function(latitude, longitude) {
+
+        var mapOptions = {
+            center: new google.maps.LatLng(latitude, longitude),
+            zoom: 1,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map
+        (document.getElementById("map"), mapOptions);
+
+
+        var latLong = new google.maps.LatLng(latitude, longitude);
+
+        var marker = new google.maps.Marker({
+            position: latLong
+        });
+
+        marker.setMap(map);
+        map.setZoom(15);
+        map.setCenter(marker.getPosition());
+    },
+
     getGeo: function() {
 
         navigator.geolocation.getCurrentPosition(function(position){
@@ -19,8 +43,7 @@ var app = {
             // Tudo certo, vamos capturar
             var location = [position.coords.latitude, position.coords.longitude];
 
-            // Exibição básica
-            alert(location);
+            app.getMap(location[0], location[1]);
         },
         function(error){
             // Erro ao buscar GPS coordenadas
