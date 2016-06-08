@@ -1,4 +1,8 @@
+var marker1, marker2;
+var poly, geodesicPoly;
+
 var app = {
+
 
     initialize: function() {
         this.bindEvents();
@@ -13,27 +17,60 @@ var app = {
     },
 
     // Get map by using coordinates
-    getMap: function(latitude, longitude) {
+   initMap: function(latitude, longitude) {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 2,
+        center: {lat: latitude, lng: longitude}
+      });
 
-        var mapOptions = {
-            center: new google.maps.LatLng(latitude, longitude),
-            zoom: 1,
-            mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
+      map.controls[google.maps.ControlPosition.TOP_CENTER].push(
+          document.getElementById('info'));
 
-        map = new google.maps.Map
-        (document.getElementById("map"), mapOptions);
+      marker1 = new google.maps.Marker({
+        map: map,
+        draggable: true,
+        position: {lat: latitude, lng: longitude}
+      });
 
+      marker2 = new google.maps.Marker({
+        map: map,
+        draggable: true,
+        position: {lat: 48.857, lng: 2.352}
+      });
 
-        var latLong = new google.maps.LatLng(latitude, longitude);
+      var bounds = new google.maps.LatLngBounds(
+          marker1.getPosition(), marker2.getPosition());
+      map.fitBounds(bounds);
 
-        var marker = new google.maps.Marker({
-            position: latLong
-        });
+      google.maps.event.addListener(marker1, 'position_changed', app.update);
+      google.maps.event.addListener(marker2, 'position_changed', app.update);
 
-        marker.setMap(map);
-        map.setZoom(15);
-        map.setCenter(marker.getPosition());
+      poly = new google.maps.Polyline({
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        map: map,
+      });
+
+      geodesicPoly = new google.maps.Polyline({
+        strokeColor: '#CC0099',
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        geodesic: true,
+        map: map
+      });
+
+      app.update();
+    },
+
+    update: function() {
+      var path = [marker1.getPosition(), marker2.getPosition()];
+      poly.setPath(path);
+      geodesicPoly.setPath(path);
+      var heading = google.maps.geometry.spherical.computeHeading(path[0], path[1]);
+      document.getElementById('heading').value = heading;
+      document.getElementById('origin').value = path[0].toString();
+      document.getElementById('destination').value = path[1].toString();
     },
 
     getGeo: function() {
@@ -43,7 +80,7 @@ var app = {
             // Tudo certo, vamos capturar
             var location = [position.coords.latitude, position.coords.longitude];
 
-            app.getMap(location[0], location[1]);
+            app.initMap(location[0], location[1]);
         },
         function(error){
             // Erro ao buscar GPS coordenadas
