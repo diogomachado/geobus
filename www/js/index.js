@@ -32,11 +32,15 @@ var app = {
         position: {lat: latitude, lng: longitude}
       });
 
+        console.log(marker1);
+
       marker2 = new google.maps.Marker({
         map: map,
         draggable: true,
-        position: {lat: 48.857, lng: 2.352}
+        position: {lat: -20.726540, lng: -40.887936} ,
       });
+
+       console.log(marker2);
 
       var bounds = new google.maps.LatLngBounds(
           marker1.getPosition(), marker2.getPosition());
@@ -67,10 +71,11 @@ var app = {
       var path = [marker1.getPosition(), marker2.getPosition()];
       poly.setPath(path);
       geodesicPoly.setPath(path);
-      var heading = google.maps.geometry.spherical.computeHeading(path[0], path[1]);
-      document.getElementById('heading').value = heading;
-      document.getElementById('origin').value = path[0].toString();
-      document.getElementById('destination').value = path[1].toString();
+
+      //  Calcula distancia em metros
+      var distance = google.maps.geometry.spherical.computeDistanceBetween(path[0], path[1]);
+
+      document.getElementById('heading').innerHTML = distance;
     },
 
     getGeo: function() {
